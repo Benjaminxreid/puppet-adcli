@@ -13,10 +13,6 @@
 #   and want to audit the difference between existing files and the ones
 #   managed by Puppet. Default: false
 #
-# [*isabsent*]
-#   Set to 'true' to remove all the resources installed by the module
-#   Default: false
-#
 # [*join_domain*]
 #   Set to 'true' to join machine to the domain
 #   Default: false
@@ -29,7 +25,11 @@
 #   Set noop metaparameter to true for all the resources managed by the module.
 #   Basically you can run a dryrun for this specific module if you set
 #   this to true. Default: undef
-
+#
+# [*remove_package*]
+#   Set to 'true' to remove all the resources installed by the module
+#   Default: false
+#
 # [*version*]
 #   The package version, used in the ensure parameter of package type.
 #   Default: present. Can be 'latest' or a specific version number.
@@ -84,10 +84,10 @@
 class adcli (
   $audit_only           = false,
   $external_service     = '',
-  $isabsent             = false,
   $join_domain          = false,
   $my_class             = '',
   $noops                = undef,
+  $remove_package       = false,
   $version              = 'present',
 
   # required parameters

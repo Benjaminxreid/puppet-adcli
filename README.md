@@ -25,7 +25,8 @@ Adcli (Active Directory Command Line Interface) is a management tool available o
 ### What adcli affects
 
 * Your system's `/etc/krb5.keytab` file
-* Using Your system's `/etc/krb5.conf`
+* Which is used by mit or heimdal krb5 via `/etc/krb5.conf`
+* Its recommend to also configure these (mit or heimdal krb5):
 
 ### Beginning with adcli
 
@@ -180,7 +181,7 @@ class { 'adcli':
 
 ## Limitations
 
-This module is tested and officially supported on Cent of 7, Debian 7 and Ubuntu 12.04, and 14.04. Testing on other platforms has been light and cannot be guaranteed.
+This module is tested and officially supported on Centos 7, Debian 7 and Ubuntu 12.04, and 14.04. Testing on other platforms has been light and cannot be guaranteed. Its suggested to use this module inconjuction with mit or heimdal krb5.
 
 ## Development
 
