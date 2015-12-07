@@ -85,7 +85,7 @@ class { 'adcli':
 ### Remove adcli package
 ~~~puppet
 class { 'adcli':
-  absent => true,
+  remove_package => true,
 }
 ~~~
 
