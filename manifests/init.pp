@@ -143,7 +143,7 @@ class adcli (
   $package=$adcli::params::package
 
   # Variables that apply parameters behaviours
-  $manage_package = $adcli::isabsent ? {
+  $manage_package = $adcli::remove_package ? {
     true  => 'absent',
     false => $adcli::version,
   }
