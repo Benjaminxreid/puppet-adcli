@@ -43,7 +43,7 @@
 #    Active Directory. Default: current shortname of this host.
 #
 # [*domain_controller*]
-#   Connect to a specific domain controller. If not specified then an appropriate 
+#   Connect to a specific domain controller. If not specified then an appropriate
 #   domain controller is automatically discovered.
 #
 # [*domain_ou*]
@@ -76,6 +76,11 @@
 #   Set to 'true' to unjoins and deletes computer from the Domain.
 #   Default: false
 #
+# [*user_principal*]
+#   Set user principal name when machine is joined to the Domain. If
+#   nothing is set COMPUTERNAME$@REALM is used.
+#   Default: undef
+#
 # [*uppercase_hostname*]
 #   Whether we should present our hostname in uppercase when joining AD.
 #   Useful for maintaining consistency with clients that joined AD via Samba
@@ -107,6 +112,7 @@ class adcli (
   $replication_wait         = '90',
   $service_names            = undef,
   $unjoin_domain            = false,
+  $user_principal           = undef,
   $uppercase_hostname       = false,
   ) inherits adcli::params {
 
@@ -156,6 +162,13 @@ class adcli (
   $manage_external_service = $adcli::external_service ? {
     ''      => undef,
     default => Service[$adcli::external_service]
+  }
+
+  if empty($adcli::user_principal) {
+    $manage_user_principal = inline_template("--user-principal=<%= @hostname.upcase %>$@<%= @domain_name.upcase %>")
+  } else {
+    validate_string($adcli::user_principal)
+    $manage_user_principal = $adcli::user_principal
   }
 
   #######################################
@@ -236,7 +249,7 @@ class adcli (
     #######################################
     if $pre_create_computer_obj {
       # You are not seeing things; we need that trailing single quote there
-      $preexec = "${exec_base_begin} preset-computer --domain=${adcli::domain_name} ${adcli::host_fqdn} --login-user=${adcli::user_name} ${exec_doc} ${exec_dou} ${exec_osn} ${exec_osv} ${exec_sp}'"
+      $preexec = "${exec_base_begin} preset-computer --domain=${adcli::domain_name} ${adcli::host_fqdn} --login-user=${adcli::user_name} ${manage_user_principal} ${exec_doc} ${exec_dou} ${exec_osn} ${exec_osv} ${exec_sp}'"
       exec { "adcli_preexec_for_${adcli::computer_name}_on_${adcli::domain_name}":
         command => $preexec,
         require => Package[$adcli::package],
@@ -251,7 +264,7 @@ class adcli (
     }
 
     # You are not seeing things; we need that trailing single quote there
-    $adcli_exec = "${exec_base_begin} ${exec_base_action} ${exec_base_end} ${exec_cn} ${exec_doc} ${exec_dou} ${exec_osn} ${exec_osv} ${exec_sp} ${exec_sns}'"
+    $adcli_exec = "${exec_base_begin} ${exec_base_action} ${exec_base_end} ${manage_user_principal} ${exec_cn} ${exec_doc} ${exec_dou} ${exec_osn} ${exec_osv} ${exec_sp} ${exec_sns}'"
     exec { "adcli_join_domain_${adcli::domain_name}":
       command => $adcli_exec,
       creates => '/etc/krb5.keytab',
